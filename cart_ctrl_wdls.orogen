@@ -1,0 +1,86 @@
+name "wdls_solver"
+
+import_types_from "kdl"
+import_types_from "base"
+using_library "kdl_parser"
+
+#
+# Cartesian Controller based on the wdls solver from KDL
+#
+task_context "CartCtrlWDLS" do
+    needs_configuration
+
+    ####### Required properties:
+
+    property("urdf_file", "/std/string").
+        doc("Filename of the urdf model.")
+
+    property("root", "/std/string").
+        doc("Root frame of the kinematic chain. Has to be a link in the given urdf model.")
+
+    property("tip", "/std/string").
+        doc("Tip frame of the kinematic chain. Has to be a link in the given urdf model.")
+
+    property("lambda", "double").
+        doc("Damping term. Reduces the output velocity in singular configurations. This value, and epsilon, 
+             should be chosen with extreme care. Reasonable value for aila's right arm is TODO")
+  
+    property("pid", "std/vector<base/actuators/PIDValues>").
+        doc("Gain for the controller. Size has to be 6.")
+
+
+    ####### Optional properties:
+
+    property("epsilon", "double", 1e-5).
+        doc("If a singular value is smaller than this, the damping term will be activated.")
+
+    property("weights_js", "/base/VectorXd").
+        doc("Weights in task space. Size has to be same as number of joints in kinematic chain. 
+             If not set, all weights are set by default to 1.")
+
+    property("weights_ts", "/base/VectorXd").
+        doc("Weights in task space. Size has to be 6. If not set, all values are set by default to 1.")
+
+  
+    ######## Ports:
+    
+    input_port("command", "/base/samples/RigidBodyState").
+        doc("Desired twist for the solver.")
+
+    input_port("joint_status", "/base/commands/Joints").
+        doc("Current joint state. Joint names will be mapped to the joints of the kinematic chain.")
+
+    output_port("ctrl_out", "/base/commands/Joints").
+        doc("Output velocity in joint space (IK solution).")
+
+    output_port("cartesian_status", "/base/samples/RigidBodyState").
+        doc("Debug port: Current Pose and twist of the chain tip wrt root.")
+
+    port_driven 'command'
+end
+
+#
+# Alternative implementation of the WDLSController. Computes damping online according to current manipulability: 
+# lambda = lambda_0 * (1 - m / m_0)^2  where m_0 is the maximum manipulability is the workspace of the robot. This
+# should lead to a smoother and more secure motion, since the transition from damped to undamped behavior is omitted
+# and the damping is not constant for all configurations.
+# Lambda_0 is equal to the lambda property value (see WDLSSolver). Epsilon should be set to a very high value, 
+# so that the damping term is always active. 
+#
+task_context "CartCtrlAdaptiveWDLS" do
+    subclasses "cart_ctrl_wdls::CartCtrlWDLS"
+    needs_configuration
+
+    ####### Optional properties: 
+    property("max_manipulability", "double").
+        doc("Maximum Manipulability value in the workspace of the robot. Used as normalization term
+            when computing the damping factor. If unknown, leave empty, so that the value will be computed online. This may lead
+            to slow velocities at startup. ")
+
+    ####### Ports: 
+    output_port("manipulability", "double").
+        doc("Current manipulability of the kinematic chain.")
+
+    output_port("cur_lambda", "double").
+        doc("Current damping term.")
+end

@@ -1,13 +1,14 @@
-name "wdls_solver"
+name "cart_ctrl_wdls"
 
 import_types_from "kdl"
 import_types_from "base"
 using_library "kdl_parser"
+using_library "kdl_conversions"
 
 #
-# Cartesian Controller based on the wdls solver from KDL
+# Weighted Damped Least Squares Solver from KDL
 #
-task_context "CartCtrlWDLS" do
+task_context "WDLSSolver" do
     needs_configuration
 
     ####### Required properties:
@@ -23,40 +24,40 @@ task_context "CartCtrlWDLS" do
 
     property("lambda", "double").
         doc("Damping term. Reduces the output velocity in singular configurations. This value, and epsilon, 
-             should be chosen with extreme care. Reasonable value for aila's right arm is TODO")
+             should be chosen with extreme care. Depends on kinematic structure of the robot. 
+             Reasonable value for aila's right arm was 0.1")
   
-    property("pid", "std/vector<base/actuators/PIDValues>").
-        doc("Gain for the controller. Size has to be 6.")
-
-
     ####### Optional properties:
 
     property("epsilon", "double", 1e-5).
-        doc("If a singular value is smaller than this, the damping term will be activated.")
+        doc("If a singular value is smaller than this, the damping term will be activated. If you want damping in wider range
+             of configurations, increase this value.")
 
     property("weights_js", "/base/VectorXd").
-        doc("Weights in task space. Size has to be same as number of joints in kinematic chain. 
-             If not set, all weights are set by default to 1.")
+        doc("Weights in task space in the range 0 ... 1. Size has to be same as number of joints in kinematic chain. 
+             Zero weight means that the corresponding joint will not be used at all. If not set, all weights are set by default to 1.")
 
     property("weights_ts", "/base/VectorXd").
-        doc("Weights in task space. Size has to be 6. If not set, all values are set by default to 1.")
+        doc("Weights in task space in the range 0 ... 1. Size has to be 6. 
+             Zero weight means that the corresponding task space direction will not be used at all. 
+             If not set, all values are set by default to 1.")
 
-  
     ######## Ports:
     
-    input_port("command", "/base/samples/RigidBodyState").
-        doc("Desired twist for the solver.")
+    input_port("desired_twist", "/base/samples/RigidBodyState").
+        doc("Input twist (Translational and rotational Cartesian velocity) for the solver.")
 
-    input_port("joint_status", "/base/commands/Joints").
-        doc("Current joint state. Joint names will be mapped to the joints of the kinematic chain.")
+    input_port("joint_status", "/base/samples/Joints").
+        doc("Current joint state. Joint names will be mapped to the joints of the kinematic chain, so the 
+             input may actually contain more joint that the kinematic chain.")
 
-    output_port("ctrl_out", "/base/commands/Joints").
+    output_port("solver_output", "/base/commands/Joints").
         doc("Output velocity in joint space (IK solution).")
 
     output_port("cartesian_status", "/base/samples/RigidBodyState").
-        doc("Debug port: Current Pose and twist of the chain tip wrt root.")
+        doc("Current Pose and twist of the tip of the kinematic chain withn respect root frame.")
 
-    port_driven 'command'
+    port_driven 'desired_twist'
 end
 
 #
@@ -64,18 +65,18 @@ end
 # lambda = lambda_0 * (1 - m / m_0)^2  where m_0 is the maximum manipulability is the workspace of the robot. This
 # should lead to a smoother and more secure motion, since the transition from damped to undamped behavior is omitted
 # and the damping is not constant for all configurations.
-# Lambda_0 is equal to the lambda property value (see WDLSSolver). Epsilon should be set to a very high value, 
+# Lambda_0 will be set equal to the lambda property value (see WDLSSolver). Epsilon should be set to a very high value, 
 # so that the damping term is always active. 
 #
-task_context "CartCtrlAdaptiveWDLS" do
-    subclasses "cart_ctrl_wdls::CartCtrlWDLS"
+task_context "AdaptiveWDLSSolver" do
+    subclasses "cart_ctrl_wdls::WDLSSolver"
     needs_configuration
 
     ####### Optional properties: 
     property("max_manipulability", "double").
         doc("Maximum Manipulability value in the workspace of the robot. Used as normalization term
-            when computing the damping factor. If unknown, leave empty, so that the value will be computed online. This may lead
-            to slow velocities at startup. ")
+            when computing the damping factor. If unknown, leave empty, so that the value will be computed online, which may lead
+            to slow velocities at startup.")
 
     ####### Ports: 
     output_port("manipulability", "double").
@@ -84,3 +85,57 @@ task_context "CartCtrlAdaptiveWDLS" do
     output_port("cur_lambda", "double").
         doc("Current damping term.")
 end
+
+#
+# Cartesian Pose Controller
+#
+task_context "CartCtrl" do
+    needs_configuration
+    cycle_time = 0.01
+
+    ####### Optional properties: 
+
+    property("cycle_time", "double", cycle_time).
+        doc("Control cycle time in seconds.")
+
+    property("p_gain", "/base/VectorXd").
+        doc("Proportional Gain for the controller. Size has to be 6. If not set, all values default to 1.")
+
+    property("max_ctrl_out", "/base/samples/RigidBodyState").
+        doc("Max controller output twist. If one value exceeds this maximum, all other values will be
+             scaled accordingly. If not set, arbitrarily high controller output is allowed.")
+
+    ####### Ports: 
+    
+    input_port("command", "/base/samples/RigidBodyState").
+        doc("Desired pose (controller reference)")
+
+    input_port("cartesian_status", "/base/samples/RigidBodyState").
+        doc("Current pose")
+   
+    output_port("ctrl_error", "/base/samples/RigidBodyState").
+        doc("Debug port: Current Control error as twist.")
+   
+    output_port("ctrl_out", "/base/samples/RigidBodyState").
+        doc("Controller output as twist")
+
+    periodic cycle_time
+
+end
+
+#
+# Convert Joint Velocity Commands to Position Commands
+#
+task_context "ToPosConverter" do
+    input_port("joint_status", "/base/samples/Joints").
+        doc("Current Joint Status")
+
+    input_port("command", "/base/commands/Joints").
+        doc("Velocity based input")
+
+    output_port("command_out", "/base/commands/Joints").
+        doc("Position based output")
+
+    port_driven "command"
+end
+

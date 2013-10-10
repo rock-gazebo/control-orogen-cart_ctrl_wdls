@@ -23,24 +23,18 @@ task_context "WDLSSolver" do
         doc("Tip frame of the kinematic chain. Has to be a link in the given urdf model.")
 
     property("lambda", "double").
-        doc("Damping term. Reduces the output velocity in singular configurations. This value, and epsilon, 
-             should be chosen with extreme care. Depends on kinematic structure of the robot. 
-             Reasonable value for aila's right arm was 0.1")
+        doc("Damping term. Reduces the output velocity in singular configurations. This value, and epsilon, should be chosen with extreme care. Depends on kinematic structure of the robot. Reasonable value for aila's right arm was 0.1")
   
     ####### Optional properties:
 
     property("epsilon", "double", 1e-5).
-        doc("If a singular value is smaller than this, the damping term will be activated. If you want damping in wider range
-             of configurations, increase this value.")
+        doc("If a singular value is smaller than this, the damping term will be activated. If you want damping in wider range of configurations, increase this value.")
 
     property("weights_js", "/base/VectorXd").
-        doc("Weights in task space in the range 0 ... 1. Size has to be same as number of joints in kinematic chain. 
-             Zero weight means that the corresponding joint will not be used at all. If not set, all weights are set by default to 1.")
+        doc("Weights in task space in the range 0 ... 1. Size has to be same as number of joints in kinematic chain. Zero weight means that the corresponding joint will not be used at all. If not set, all weights are set by default to 1.")
 
     property("weights_ts", "/base/VectorXd").
-        doc("Weights in task space in the range 0 ... 1. Size has to be 6. 
-             Zero weight means that the corresponding task space direction will not be used at all. 
-             If not set, all values are set by default to 1.")
+        doc("Weights in task space in the range 0 ... 1. Size has to be 6. Zero weight means that the corresponding task space direction will not be used at all. If not set, all values are set by default to 1.")
 
     ######## Ports:
     
@@ -48,8 +42,7 @@ task_context "WDLSSolver" do
         doc("Input twist (Translational and rotational Cartesian velocity) for the solver.")
 
     input_port("joint_status", "/base/samples/Joints").
-        doc("Current joint state. Joint names will be mapped to the joints of the kinematic chain, so the 
-             input may actually contain more joint that the kinematic chain.")
+        doc("Current joint state. Joint names will be mapped to the joints of the kinematic chain, so the input may actually contain more joint that the kinematic chain.")
 
     output_port("solver_output", "/base/commands/Joints").
         doc("Output velocity in joint space (IK solution).")
@@ -74,9 +67,7 @@ task_context "AdaptiveWDLSSolver" do
 
     ####### Optional properties: 
     property("max_manipulability", "double").
-        doc("Maximum Manipulability value in the workspace of the robot. Used as normalization term
-            when computing the damping factor. If unknown, leave empty, so that the value will be computed online, which may lead
-            to slow velocities at startup.")
+        doc("Maximum Manipulability value in the workspace of the robot. Used as normalization term when computing the damping factor. If unknown, leave empty, so that the value will be computed online, which may lead to slow velocities at startup.")
 
     ####### Ports: 
     output_port("manipulability", "double").
@@ -102,8 +93,7 @@ task_context "CartCtrl" do
         doc("Proportional Gain for the controller. Size has to be 6. If not set, all values default to 1.")
 
     property("max_ctrl_out", "/base/samples/RigidBodyState").
-        doc("Max controller output twist. If one value exceeds this maximum, all other values will be
-             scaled accordingly. If not set, arbitrarily high controller output is allowed.")
+        doc("Max controller output twist. If one value exceeds this maximum, all other values will be scaled accordingly. If not set, arbitrarily high controller output is allowed.")
 
     ####### Ports: 
     

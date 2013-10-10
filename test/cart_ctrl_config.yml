@@ -1,0 +1,16 @@
+# Control cycle time in seconds.
+cycle_time: 0.01
+
+# Max controller output twist. If one value exceeds this maximum, all other values will be
+# scaled accordingly. If not set, arbitrarily high controller output is allowed.
+max_ctrl_out:
+  velocity:
+    data:
+    - 0.1
+    - 0.1
+    - 0.1
+  angular_velocity:
+    data:
+    - 0.3
+    - 0.3
+    - 0.3

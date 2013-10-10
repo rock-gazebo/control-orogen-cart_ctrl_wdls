@@ -1,0 +1,607 @@
+<?xml version="1.0"?>
+<robot name="artemis">
+
+    <material name="ArtemisGreen">
+            <color rgba="0.2 0.9 0.2 1.0"/>
+    </material>
+
+        <material name="ArtemisBlue">
+                <!--color rgba="0.2 0.2 0.9 1.0"/-->
+                <color rgba="0.2 0.2 0.2 1.0"/>
+        </material>
+
+     <link name="base_link">
+            <origin xyz="0.0 0.0 0.0" rpy="0 0 0"/>
+		<visual>
+                        <origin xyz="0.0 0.0 0.0" rpy="0 0 0"/>
+	  		<geometry>
+                                <mesh filename="./meshes/mobile_base.stl"  scale="0.001 0.001 0.001"/>
+	  		</geometry>
+                        <material name="Orange">
+			 	<color rgba="0.925 0.5625 0.0625  1.0"/>
+	   		</material>
+		</visual>
+
+		<collision>
+                        <origin xyz="0.0 0.0 0.0" rpy="0 0 0"/>
+			<geometry>
+                                <mesh filename="./meshes/mobile_base.stl"  scale="0.001 0.001 0.001"/>
+			</geometry>
+		</collision>
+	 </link>
+
+
+
+        <!-- front arm -->
+
+	<!-- laser scanner -->
+	
+         <link name="front_hokuyo_link">
+                <visual>
+                        <origin xyz="0 0 0.0" rpy="1.57 -1.57 0" />
+                        <geometry>
+                          <mesh filename="./meshes/PTU-HokuyoUnit.stl" scale="0.001 0.001 0.001" />
+                        </geometry>
+                        <material name="Grey">
+                          <color rgba="0.925 0.8 0.8 1.0"/>
+                        </material>
+                </visual>
+
+		<collision>
+			<origin xyz="0 0 0.0" rpy="1.57 -1.57 0" />
+			<geometry>
+                                <mesh filename="./meshes/PTU-HokuyoUnit.stl" scale="0.001 0.001 0.001"/>
+			</geometry>
+		</collision>      
+        </link>
+	
+        <joint name="front_hokuyo_joint" type="revolute">
+                <parent link="base_link"/>
+                <child link="front_hokuyo_link"/>
+                <origin xyz="0.60 -0.055 0.35"  rpy="0 0 0" />
+                <axis xyz="0 1 0"/>
+                <limit upper="3.14" lower="-3.14" effort="10" velocity="3" />
+        </joint>
+
+        <!-- Arm mount dummy joint -->
+        <joint name="frontArm_mount_joint" type="fixed">
+                <origin xyz="0.56 0.075 0.30" rpy="0 0 0"/>
+                <axis xyz="0 0 1" rpy="0 0 0"/>
+                <parent link="base_link"/>
+                <child link="frontArm_mount_link"/>
+                <limit lower="-3.1415926535897931" upper="3.1415926535897931" effort="1" velocity="3.1415926535897931"/>
+        </joint>
+
+        <link name="frontArm_mount_link">
+                <visual>
+                        <material name="ArtemisGreen" />
+                        <origin xyz="0 0 0 " rpy="0 0 0"/>
+                        <!--origin xyz="0 0 0.0" rpy="0 0 0"/-->
+                        <geometry>
+                                <box size="0.01 0.01 0.01"/>
+                        </geometry>
+                </visual>
+                <collision>
+                        <origin xyz="0 0 0" rpy="0 0 0"/>
+                        <!--origin xyz="0 0 0.0" rpy="0 0 0"/-->
+                        <geometry>
+                                <box size="0.01 0.01 0.01"/>
+                        </geometry>
+                </collision>
+        </link>
+
+	<!-- First revolute joint & link -->
+
+        <joint name="frontArm_joint_1" type="revolute">
+                <!--origin xyz="0.56 0.075 0.30" rpy="0 0 0"/-->
+                <origin xyz="0.0 0.00 0.0" rpy="0 0 0"/>
+		<axis xyz="0 0 1" rpy="0 0 0"/>
+                <parent link="frontArm_mount_link"/>
+                <child link="frontArm_link_1"/>
+		<limit lower="-3.1415926535897931" upper="3.1415926535897931" effort="1" velocity="3.1415926535897931"/>
+	</joint>
+
+        <link name="frontArm_link_1">
+		<visual>
+                        <material name="ArtemisGreen" />
+                        <origin xyz="0 0 0 " rpy="0 0 0"/>
+			<!--origin xyz="0 0 0.0" rpy="0 0 0"/-->
+			<geometry>
+                                <mesh filename="./meshes/joint_1.stl"/>
+			</geometry>
+		</visual>
+		<collision>
+                        <origin xyz="0 0 0" rpy="0 0 0"/>
+			<!--origin xyz="0 0 0.0" rpy="0 0 0"/-->
+
+			<geometry>
+                                <mesh filename="./meshes/joint_1.stl"/>
+			</geometry>
+		</collision>
+	</link>
+
+        <!-- Second revolute joint & link -->
+
+        <joint name="frontArm_joint_2" type="revolute">
+                <origin xyz="0 0 0.158" rpy="1.570796327 0 0"/>
+                <axis xyz="0 0 -1"/>
+                <parent link="frontArm_link_1"/>
+                <child link="frontArm_link_2"/>
+                <limit lower="-3.1415926535897931" upper="3.1415926535897931" effort="1" velocity="3.1415926535897931"/>
+        </joint>
+
+        <link name="frontArm_link_2">
+                <visual>
+                        <material name="ArtemisGreen" />
+                        <origin xyz="0 0 0.0" rpy="0 0 0"/>
+                        <geometry>
+                                <mesh filename="./meshes/joint_2.stl" />
+                        </geometry>
+                </visual>
+                <collision>
+                        <origin xyz="0 0 0.0" rpy="0 0 0"/>
+                        <geometry>
+                        <mesh filename="./meshes/joint_2.stl" />
+                        </geometry>
+                </collision>
+        </link>
+
+        <!-- Third revolute joint & link -->
+
+        <joint name="frontArm_joint_3" type="revolute">
+                <origin xyz="0.0 0.28 0.0 " rpy="0 0 0"/>
+                <axis xyz="0 0 -1"/>
+                <parent link="frontArm_link_2"/>
+                <child link="frontArm_link_3"/>
+                <limit lower="-3.1415926535897931" upper="3.1415926535897931" effort="1" velocity="3.1415926535897931"/>
+        </joint>
+
+        <link name="frontArm_link_3">
+                <visual>
+                        <material name="ArtemisGreen" />
+                        <origin xyz="0 0. 0.0" rpy="0 0 0"/>
+                        <geometry>
+                        <mesh filename="./meshes/joint_3.stl" />
+                        </geometry>
+                </visual>
+                <collision>
+                        <origin xyz="0 0. 0.0" rpy="0 0 0"/>
+                        <geometry>
+                        <mesh filename="./meshes/joint_3.stl"/>
+                        </geometry>
+                </collision>
+        </link>
+
+        <!-- Fourth revolute joint & link -->
+        <joint name="frontArm_joint_4" type="revolute">
+                <origin xyz="0 0.0 0.0 " rpy="-1.570796327 0 0"/>
+                <axis xyz="0 0 1"/>
+                <parent link="frontArm_link_3"/>
+                <child link="frontArm_link_4"/>
+                <limit lower="-3.1415926535897931" upper="3.1415926535897931" effort="1" velocity="3.1415926535897931"/>
+        </joint>
+        <link name="frontArm_link_4">
+                <visual>
+                        <material name="ArtemisGreen" />
+                        <origin xyz="0 0 0" rpy="0 0 0"/>
+                        <geometry>
+                        <mesh filename="./meshes/joint_4.stl" />
+                        </geometry>
+                </visual>
+                <collision>
+                        <origin xyz="0 0 0" rpy="0 0 0"/>
+                        <geometry>
+                        <mesh filename="./meshes/joint_4.stl" />
+                        </geometry>
+                </collision>
+        </link>
+
+        <!-- Fifth revolute joint & link -->
+        <joint name="frontArm_joint_5" type="revolute">
+                <origin xyz="0 0 0.340" rpy="1.570796327 0 0"/>
+                <axis xyz="0 0 -1"/>
+                <parent link="frontArm_link_4"/>
+                <child link="frontArm_link_5"/>
+                <limit lower="-3.1415926535897931" upper="3.1415926535897931" effort="1" velocity="3.1415926535897931"/>
+        </joint>
+        <link name="frontArm_link_5">
+                <visual>
+                        <material name="ArtemisGreen" />
+                        <origin xyz="0 0 0" rpy="0 0 0"/>
+                        <geometry>
+                        <mesh filename="./meshes/joint_5.stl" />
+                        </geometry>
+                </visual>
+                <collision>
+                        <origin xyz="0 0 -0.042276823" rpy="0 -0.959931089 1.570796327"/>
+                        <geometry>
+                        <mesh filename="./meshes/joint_5.stl" />
+                        </geometry>
+                </collision>
+        </link>
+
+        <!-- Sixth revolute joint & link -->
+        <joint name="frontArm_joint_6" type="revolute">
+                <origin xyz="0 0.346 0" rpy="-1.570796327 0 0"/>
+                <axis xyz="0 0 1"/>
+                <parent link="frontArm_link_5"/>
+                <child link="frontArm_link_6"/>
+                <limit lower="-3.1415926535897931" upper="3.1415926535897931" effort="1" velocity="3.1415926535897931"/>
+        </joint>
+        <link name="frontArm_link_6">
+                <visual>
+                        <material name="ArtemisGreen" />
+                        <origin xyz="0 0 -0.346" rpy="0 0 0"/>
+                        <geometry>
+                        <mesh filename="./meshes/joint_6_wt_sensor.stl" />
+                        </geometry>
+                </visual>
+                <collision>
+                        <origin xyz="0 0 -0.346" rpy="0 0 0"/>
+                        <geometry>
+                        <mesh filename="./meshes/joint_6_wt_sensor.stl" />
+                        </geometry>
+                </collision>
+        </link>
+
+        <!-- Gripper joint & link -->
+        <joint name="frontArm_gripper_joint" type="fixed">
+                <origin xyz="0 0 -0.1743" rpy="0 0 0"/>
+                <axis xyz="0 0 1"/>
+                <parent link="frontArm_link_6"/>
+                <child link="frontArm_gripper_link"/>
+                <limit lower="-3.1415926535897931" upper="3.1415926535897931" effort="1" velocity="3.1415926535897931"/>
+        </joint>
+        <link name="frontArm_gripper_link">
+                <visual>
+                        <material name="ArtemisGreen" />
+                        <origin xyz="0 0 0" rpy="0 0 0"/>
+                        <geometry>
+                        <mesh filename="./meshes/gripper_no_finger.stl" />
+                        </geometry>
+                </visual>
+                <collision>
+                        <origin xyz="0 0 0" rpy="0 0 0"/>
+                        <geometry>
+                        <mesh filename="./meshes/gripper_no_finger.stl" />
+                        </geometry>
+                </collision>
+        </link>
+
+        <!-- Gripper left joint & link -->
+        <joint name="frontArm_leftFinger_joint" type="revolute">
+                <origin xyz="0.002 0.018750 0.055 " rpy="0 0 0"/>
+                <axis xyz="1 0 0"/>
+                <parent link="frontArm_gripper_link"/>
+                <child link="frontArm_leftFinger_link"/>
+                <limit lower="-3.1415926535897931" upper="3.1415926535897931" effort="1" velocity="3.1415926535897931"/>
+        </joint>
+        <link name="frontArm_leftFinger_link">
+                <visual>
+                        <material name="ArtemisGreen" />
+                        <origin xyz="0 0 0" rpy="0 0 0"/>
+                        <geometry>
+                        <mesh filename="./meshes/left_finger.stl" />
+                        </geometry>
+                </visual>
+                <collision>
+                        <origin xyz="0 0 0" rpy="0 0 0"/>
+                        <geometry>
+                        <mesh filename="./meshes/left_finger.stl" />
+                        </geometry>
+                </collision>
+        </link>
+
+        <!-- Gripper right joint & link -->
+        <joint name="frontArm_rightFinger_joint" type="revolute">
+                <origin xyz="0.002 -0.018750 0.055 " rpy="0 0 0"/>
+                <axis xyz="1 0 0"/>
+                <parent link="frontArm_gripper_link"/>
+                <child link="frontArm_rightFinger_link"/>
+                <limit lower="-3.1415926535897931" upper="3.1415926535897931" effort="1" velocity="3.1415926535897931"/>
+        </joint>
+        <link name="frontArm_rightFinger_link">
+                <visual>
+                        <material name="ArtemisGreen" />
+                        <origin xyz="0 0 0" rpy="0 0 0"/>
+                        <geometry>
+                        <mesh filename="./meshes/right_finger.stl" />
+                        </geometry>
+                </visual>
+                <collision>
+                        <origin xyz="0 0 0" rpy="0 0 0"/>
+                        <geometry>
+                        <mesh filename="./meshes/right_finger.stl" />
+                        </geometry>
+                </collision>
+        </link>
+        
+        <!-- rear arm -->
+
+        <!-- laser scanner -->
+
+         <link name="rear_hokuyo_link">
+                <visual>
+                        <origin xyz="0 0 0.0" rpy="1.57 -1.57 0" />
+                        <geometry>
+                          <mesh filename="./meshes/PTU-HokuyoUnit.stl" scale="0.001 0.001 0.001" />
+                        </geometry>
+                        <material name="Grey">
+                          <color rgba="0.925 0.8 0.8 1.0"/>
+                        </material>
+                </visual>
+
+                <collision>
+                        <origin xyz="0 0 0.0" rpy="1.57 -1.57 0" />
+                        <geometry>
+                                <mesh filename="./meshes/PTU-HokuyoUnit.stl" scale="0.001 0.001 0.001"/>
+                        </geometry>
+                </collision>
+        </link>
+
+        <joint name="rear_hokuyo_joint" type="revolute">
+                <parent link="base_link"/>
+                <child link="rear_hokuyo_link"/>
+                <origin xyz="-0.54 0.055 0.35"  rpy="0 0 3.1415926535897931" />
+                <axis xyz="0 1 0"/>
+                <limit upper="3.14" lower="-3.14" effort="10" velocity="3" />
+        </joint>
+
+        <!-- Arm mount dummy joint -->
+        <joint name="rearArm_mount_joint" type="fixed">
+                <origin xyz="-0.50 -0.075 0.30" rpy="0 0 3.1415926535897931"/>
+                <axis xyz="0 0 1" rpy="0 0 0"/>
+                <parent link="base_link"/>
+                <child link="rearArm_mount_link"/>
+                <limit lower="-3.1415926535897931" upper="3.1415926535897931" effort="1" velocity="3.1415926535897931"/>
+        </joint>
+
+        <link name="rearArm_mount_link">
+                <visual>
+                        <material name="ArtemisGreen" />
+                        <origin xyz="0 0 0 " rpy="0 0 0"/>
+                        <!--origin xyz="0 0 0.0" rpy="0 0 0"/-->
+                        <geometry>
+                                <box size="0.01 0.01 0.01"/>
+                        </geometry>
+                </visual>
+                <collision>
+                        <origin xyz="0 0 0" rpy="0 0 0"/>
+                        <!--origin xyz="0 0 0.0" rpy="0 0 0"/-->
+                        <geometry>
+                                <box size="0.01 0.01 0.01"/>
+                        </geometry>
+                </collision>
+        </link>
+
+
+        <!-- First revolute joint & link -->
+
+        <joint name="rearArm_joint_1" type="revolute">
+                <!--origin xyz="-0.50 -0.075 0.30" rpy="0 0 3.1415926535897931"/-->
+                <origin xyz="0.0 0.0 0.0" rpy="0 0 0"/>
+                <axis xyz="0 0 1" rpy="0 0 0"/>
+                <parent link="rearArm_mount_link"/>
+                <child link="rearArm_link_1"/>
+                <limit lower="-3.1415926535897931" upper="3.1415926535897931" effort="1" velocity="3.1415926535897931"/>
+        </joint>
+
+        <link name="rearArm_link_1">
+                <visual>
+                        <material name="ArtemisBlue" />
+                        <origin xyz="0 0 0 " rpy="0 0 0"/>
+                        <!--origin xyz="0 0 0.0" rpy="0 0 0"/-->
+                        <geometry>
+                                <mesh filename="./meshes/joint_1.stl"/>
+                        </geometry>
+                </visual>
+                <collision>
+                        <origin xyz="0 0 0" rpy="0 0 0"/>
+                        <!--origin xyz="0 0 0.0" rpy="0 0 0"/-->
+
+                        <geometry>
+                                <mesh filename="./meshes/joint_1.stl"/>
+                        </geometry>
+                </collision>
+        </link>
+
+        <!-- Second revolute joint & link -->
+
+        <joint name="rearArm_joint_2" type="revolute">
+                <origin xyz="0 0 0.158" rpy="1.570796327 0 0"/>
+                <axis xyz="0 0 -1"/>
+                <parent link="rearArm_link_1"/>
+                <child link="rearArm_link_2"/>
+                <limit lower="-3.1415926535897931" upper="3.1415926535897931" effort="1" velocity="3.1415926535897931"/>
+        </joint>
+
+        <link name="rearArm_link_2">
+                <visual>
+                        <material name="ArtemisBlue" />
+                        <origin xyz="0 0 0.0" rpy="0 0 0"/>
+                        <geometry>
+                                <mesh filename="./meshes/joint_2.stl" />
+                        </geometry>
+                </visual>
+                <collision>
+                        <origin xyz="0 0 0.0" rpy="0 0 0"/>
+                        <geometry>
+                        <mesh filename="./meshes/joint_2.stl" />
+                        </geometry>
+                </collision>
+        </link>
+
+        <!-- Third revolute joint & link -->
+
+        <joint name="rearArm_joint_3" type="revolute">
+                <origin xyz="0.0 0.28 0.0 " rpy="0 0 0"/>
+                <axis xyz="0 0 -1"/>
+                <parent link="rearArm_link_2"/>
+                <child link="rearArm_link_3"/>
+                <limit lower="-3.1415926535897931" upper="3.1415926535897931" effort="1" velocity="3.1415926535897931"/>
+        </joint>
+
+        <link name="rearArm_link_3">
+                <visual>
+                        <material name="ArtemisBlue" />
+                        <origin xyz="0 0. 0.0" rpy="0 0 0"/>
+                        <geometry>
+                        <mesh filename="./meshes/joint_3.stl" />
+                        </geometry>
+                </visual>
+                <collision>
+                        <origin xyz="0 0. 0.0" rpy="0 0 0"/>
+                        <geometry>
+                        <mesh filename="./meshes/joint_3.stl"/>
+                        </geometry>
+                </collision>
+        </link>
+
+        <!-- Fourth revolute joint & link -->
+        <joint name="rearArm_joint_4" type="revolute">
+                <origin xyz="0 0.0 0.0 " rpy="-1.570796327 0 0"/>
+                <axis xyz="0 0 1"/>
+                <parent link="rearArm_link_3"/>
+                <child link="rearArm_link_4"/>
+                <limit lower="-3.1415926535897931" upper="3.1415926535897931" effort="1" velocity="3.1415926535897931"/>
+        </joint>
+        <link name="rearArm_link_4">
+                <visual>
+                        <material name="ArtemisBlue" />
+                        <origin xyz="0 0 0" rpy="0 0 0"/>
+                        <geometry>
+                        <mesh filename="./meshes/joint_4.stl" />
+                        </geometry>
+                </visual>
+                <collision>
+                        <origin xyz="0 0 0" rpy="0 0 0"/>
+                        <geometry>
+                        <mesh filename="./meshes/joint_4.stl" />
+                        </geometry>
+                </collision>
+        </link>
+
+        <!-- Fifth revolute joint & link -->
+        <joint name="rearArm_joint_5" type="revolute">
+                <origin xyz="0 0 0.340" rpy="1.570796327 0 0"/>
+                <axis xyz="0 0 -1"/>
+                <parent link="rearArm_link_4"/>
+                <child link="rearArm_link_5"/>
+                <limit lower="-3.1415926535897931" upper="3.1415926535897931" effort="1" velocity="3.1415926535897931"/>
+        </joint>
+        <link name="rearArm_link_5">
+                <visual>
+                        <material name="ArtemisBlue" />
+                        <origin xyz="0 0 0" rpy="0 0 0"/>
+                        <geometry>
+                        <mesh filename="./meshes/joint_5.stl" />
+                        </geometry>
+                </visual>
+                <collision>
+                        <origin xyz="0 0 -0.042276823" rpy="0 -0.959931089 1.570796327"/>
+                        <geometry>
+                        <mesh filename="./meshes/joint_5.stl" />
+                        </geometry>
+                </collision>
+        </link>
+
+        <!-- Sixth revolute joint & link -->
+        <joint name="rearArm_joint_6" type="revolute">
+                <origin xyz="0 0.346 0" rpy="-1.570796327 0 0"/>
+                <axis xyz="0 0 1"/>
+                <parent link="rearArm_link_5"/>
+                <child link="rearArm_link_6"/>
+                <limit lower="-3.1415926535897931" upper="3.1415926535897931" effort="1" velocity="3.1415926535897931"/>
+        </joint>
+        <link name="rearArm_link_6">
+                <visual>
+                        <material name="ArtemisBlue" />
+                        <origin xyz="0 0 -0.346" rpy="0 0 0"/>
+                        <geometry>
+                        <mesh filename="./meshes/joint_6_wt_sensor.stl" />
+                        </geometry>
+                </visual>
+                <collision>
+                        <origin xyz="0 0 -0.346" rpy="0 0 0"/>
+                        <geometry>
+                        <mesh filename="./meshes/joint_6_wt_sensor.stl" />
+                        </geometry>
+                </collision>
+        </link>
+
+        <!-- Gripper joint & link -->
+        <joint name="rearArm_gripper_joint" type="fixed">
+                <origin xyz="0 0 -0.1743" rpy="0 0 0"/>
+                <axis xyz="0 0 1"/>
+                <parent link="rearArm_link_6"/>
+                <child link="rearArm_gripper_link"/>
+                <limit lower="-3.1415926535897931" upper="3.1415926535897931" effort="1" velocity="3.1415926535897931"/>
+        </joint>
+        <link name="rearArm_gripper_link">
+                <visual>
+                        <material name="ArtemisBlue" />
+                        <origin xyz="0 0 0" rpy="0 0 0"/>
+                        <geometry>
+                        <mesh filename="./meshes/gripper_no_finger.stl" />
+                        </geometry>
+                </visual>
+                <collision>
+                        <origin xyz="0 0 0" rpy="0 0 0"/>
+                        <geometry>
+                        <mesh filename="./meshes/gripper_no_finger.stl" />
+                        </geometry>
+                </collision>
+        </link>
+
+        <!-- Gripper left joint & link -->
+        <joint name="rearArm_leftFinger_joint" type="revolute">
+                <origin xyz="0.002 0.018750 0.055 " rpy="0 0 0"/>
+                <axis xyz="1 0 0"/>
+                <parent link="rearArm_gripper_link"/>
+                <child link="rearArm_leftFinger_link"/>
+                <limit lower="-3.1415926535897931" upper="3.1415926535897931" effort="1" velocity="3.1415926535897931"/>
+        </joint>
+        <link name="rearArm_leftFinger_link">
+                <visual>
+                        <material name="ArtemisBlue" />
+                        <origin xyz="0 0 0" rpy="0 0 0"/>
+                        <geometry>
+                        <mesh filename="./meshes/left_finger.stl" />
+                        </geometry>
+                </visual>
+                <collision>
+                        <origin xyz="0 0 0" rpy="0 0 0"/>
+                        <geometry>
+                        <mesh filename="./meshes/left_finger.stl" />
+                        </geometry>
+                </collision>
+        </link>
+
+        <!-- Gripper right joint & link -->
+        <joint name="rearArm_rightFinger_joint" type="revolute">
+                <origin xyz="0.002 -0.018750 0.055 " rpy="0 0 0"/>
+                <axis xyz="1 0 0"/>
+                <parent link="rearArm_gripper_link"/>
+                <child link="rearArm_rightFinger_link"/>
+                <limit lower="-3.1415926535897931" upper="3.1415926535897931" effort="1" velocity="3.1415926535897931"/>
+        </joint>
+        <link name="rearArm_rightFinger_link">
+                <visual>
+                        <material name="ArtemisBlue" />
+                        <origin xyz="0 0 0" rpy="0 0 0"/>
+                        <geometry>
+                        <mesh filename="./meshes/right_finger.stl" />
+                        </geometry>
+                </visual>
+                <collision>
+                        <origin xyz="0 0 0" rpy="0 0 0"/>
+                        <geometry>
+                        <mesh filename="./meshes/right_finger.stl" />
+                        </geometry>
+                </collision>
+        </link>
+
+
+	
+
+</robot>

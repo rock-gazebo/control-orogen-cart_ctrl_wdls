@@ -1,0 +1,28 @@
+
+# If a singular value is smaller than this, the damping term will be activated.
+epsilon: 1.0e-05
+
+# Damping term. Reduces the output velocity in singular configurations. This value, and epsilon, 
+#              should be chosen with extreme care. Reasonable value for aila's right arm was 0.1
+lambda: 0.1
+
+# If a singular value is smaller than this, the damping term will be activated.             
+epsilon: 1
+
+# Root frame of the kinematic chain. Has to be a link in the given urdf model.
+root: frontArm_mount_link
+
+# Tip frame of the kinematic chain. Has to be a link in the given urdf model.
+tip: frontArm_gripper_link
+
+# Filename of the urdf model.
+urdf_file: artemis.urdf
+
+# Weights in task space. Size has to be same as number of joints in kinematic chain. 
+#              If not set, all weights are set by default to 1.
+weights_js:
+  data: []
+
+# Weights in task space. Size has to be 6. If not set, all values are set by default to 1.
+weights_ts:
+  data: []

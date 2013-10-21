@@ -22,6 +22,7 @@ protected:
     KDL::Twist ctrl_out_, ctrl_error_;
     KDL::Frame pose_kdl_, des_pose_kdl_;
 public:
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
     CartCtrl(std::string const& name = "cartesian_control::CartCtrl");
     CartCtrl(std::string const& name, RTT::ExecutionEngine* engine);
     ~CartCtrl(){}

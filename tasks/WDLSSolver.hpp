@@ -37,6 +37,7 @@ protected:
     KDL::JntArray solver_output_kdl_;
 
 public:
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
     WDLSSolver(std::string const& name = "cartesian_control::WDLSSolver");
     WDLSSolver(std::string const& name, RTT::ExecutionEngine* engine);
     ~WDLSSolver(){}

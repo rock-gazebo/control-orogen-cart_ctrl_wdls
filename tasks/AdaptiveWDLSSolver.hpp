@@ -23,6 +23,7 @@ protected:
 
     double manipulability(const KDL::JntArray& joint_position);
 public:
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
     AdaptiveWDLSSolver(std::string const& name = "cartesian_control::AdaptiveWDLSSolver");
     AdaptiveWDLSSolver(std::string const& name, RTT::ExecutionEngine* engine);
     ~AdaptiveWDLSSolver(){}

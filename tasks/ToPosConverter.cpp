@@ -38,6 +38,7 @@ void ToPosConverter::updateHook(){
         for(uint i = 0; i < command_in_.size(); i++)
             command_out_.elements[i].position += command_in_.elements[i].speed * diff;
 
+        command_out_.time = timestamp_;
         _command_out.write(command_out_);
 
 #ifdef DEBUG

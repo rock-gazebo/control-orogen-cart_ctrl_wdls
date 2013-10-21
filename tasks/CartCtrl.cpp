@@ -52,8 +52,11 @@ bool CartCtrl::startHook(){
 void CartCtrl::updateHook(){
     CartCtrlBase::updateHook();
 
+    base::Time timestamp = base::Time::now();
+
     if(_command.read(command_from_port_) != RTT::NoData &&
        _cartesian_status.read(cartesian_status_from_port_) != RTT::NoData){
+        LOG_DEBUG("Received Sample pos: %f, %f, %f", command_from_port_.position.x(), command_from_port_.position.y(), command_from_port_.position.z());
         kdl_conversions::RigidBodyState2KDL(command_from_port_, des_pose_kdl_);
         kdl_conversions::RigidBodyState2KDL(cartesian_status_from_port_, pose_kdl_);
 
@@ -62,6 +65,8 @@ void CartCtrl::updateHook(){
         ctrl_error_ = KDL::diff(pose_kdl_, des_pose_kdl_);
 
         kdl_conversions::KDL2RigidBodyState(ctrl_error_, ctrl_error_to_port_);
+
+        ctrl_error_to_port_.time = timestamp;
         _ctrl_error.write(ctrl_error_to_port_);
 
         for(uint i = 0; i < 6; i++ )
@@ -87,6 +92,7 @@ void CartCtrl::updateHook(){
     }
 
     kdl_conversions::KDL2RigidBodyState(ctrl_out_, ctrl_out_to_port_);
+    ctrl_out_to_port_.time = timestamp;
     _ctrl_out.write(ctrl_out_to_port_);
 
 #ifdef DEBUG

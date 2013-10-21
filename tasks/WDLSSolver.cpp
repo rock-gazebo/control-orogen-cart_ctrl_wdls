@@ -94,6 +94,12 @@ void WDLSSolver::updateHook(){
 
     if(_joint_status.read(joint_status_from_port_) != RTT::NoData){
         for(uint i = 0; i < no_joints_; i++){
+            double pos = joint_status_from_port_.getElementByName(solver_output_to_port_.names[i]).position;
+            std::string name = solver_output_to_port_.names[i];
+            if(base::isNaN(pos) || base::isInfinity(pos)){
+                LOG_WARN("Received invalid joint sample for joint %s", name.c_str());
+            }
+
             joint_status_kdl_.q(i) = joint_status_from_port_.getElementByName(solver_output_to_port_.names[i]).position;
             joint_status_kdl_.qdot(i) = joint_status_from_port_.getElementByName(solver_output_to_port_.names[i]).speed;
         }
@@ -114,6 +120,7 @@ void WDLSSolver::updateHook(){
 
         for(uint i = 0; i < no_joints_; i++)
             solver_output_to_port_.elements[i].speed  = solver_output_kdl_(i);
+        solver_output_to_port_.time = base::Time::now();
         _solver_output.write(solver_output_to_port_);
 
 

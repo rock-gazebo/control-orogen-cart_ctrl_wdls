@@ -92,7 +92,7 @@ task_context "CartCtrl" do
     property("cycle_time", "double", cycle_time).
         doc("Control cycle time in seconds.")
 
-    property("p_gain", "/base/VectorXd").
+    property("p_gain", "/std/vector<double>").
         doc("Proportional Gain for the controller. Size has to be 6. If not set, all values default to 1.")
 
     property("max_ctrl_out", "/base/samples/RigidBodyState").
@@ -125,6 +125,10 @@ task_context "ToPosConverter" do
        doc("Speed to write to joint command")
     property("write_speed", "bool").
        doc("Write speed value inmput put data or leave it unset")
+    property("position_scale", "double", 1.0).
+       doc("position = previous_position + speed * cycle_rate * position_scale")
+
+
     input_port("joint_status", "/base/samples/Joints").
         doc("Current Joint Status")
 

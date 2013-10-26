@@ -18,6 +18,7 @@ protected:
     bool write_speed_;
     base::Time timestamp_, prev_timestamp_;
     urdf::Model model_;
+    double position_scale_;
 
 public:
     ToPosConverter(std::string const& name = "cart_ctrl_wdls::ToPosConverter", TaskCore::TaskState initial_state = Stopped);

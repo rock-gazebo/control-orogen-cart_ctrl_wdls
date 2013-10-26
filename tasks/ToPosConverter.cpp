@@ -20,6 +20,7 @@ bool ToPosConverter::configureHook()
     override_output_speed_ = _override_output_speed.get();
     write_speed_ = _write_speed.get();
     std::string urdf_file = _urdf_file.get();
+    position_scale_ = _position_scale.get();
 
     //Parse urdf. This cannot fail, since treeFromFile would have failed before.
     if(urdf_file != "")
@@ -62,7 +63,7 @@ void ToPosConverter::updateHook(){
 
         double diff = (timestamp_ - prev_timestamp_).toSeconds();
         for(uint i = 0; i < command_in_.size(); i++){
-            double new_pos = command_out_.elements[i].position + command_in_.elements[i].speed * diff;
+            double new_pos = command_out_.elements[i].position + command_in_.elements[i].speed * diff * position_scale_;
             //Truncate to joint limits
             if(boost::shared_ptr<const urdf::Joint> joint = model_.getJoint(command_in_.names[i])){
                 if(new_pos < joint->limits->lower){
@@ -76,7 +77,7 @@ void ToPosConverter::updateHook(){
             }
             command_out_.elements[i].position = new_pos;
             if(write_speed_){
-                if(!base::isUnset(override_output_speed_)){
+                if(override_output_speed_){
                     LOG_DEBUG("Overriding speed for joint %s with %f", command_out_.names[i].c_str(), override_output_speed_);
                     command_out_.elements[i].speed = override_output_speed_;
                 }

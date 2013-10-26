@@ -23,9 +23,19 @@ bool CartCtrl::configureHook(){
     if (! CartCtrlBase::configureHook())
         return false;
 
-    p_gain_ = _p_gain.get();
-    if(p_gain_.size() != 6)
+    std::vector<double>p = _p_gain.get();
+    p = _p_gain.get();
+    if(p.size() != 6){
+        LOG_WARN("P Gain is not set! Or malformatted. Will use ones.");
         p_gain_ = Eigen::VectorXd::Ones(6);
+    }
+    else{
+        p_gain_ = Eigen::VectorXd::Ones(6);
+        for(uint i=0; i<p.size(); i++){
+            p_gain_(i) = p[i];
+        }
+        LOG_INFO_S << "P Gain is set to " << p_gain_ << endl;
+    }
 
     max_ctrl_out_ = _max_ctrl_out.get();
     if(!max_ctrl_out_.hasValidVelocity())

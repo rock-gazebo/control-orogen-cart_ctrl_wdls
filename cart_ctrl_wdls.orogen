@@ -110,13 +110,16 @@ task_context "CartCtrl" do
         doc("Controller output as twist")
 
     periodic cycle_time
-
 end
 
 #
 # Convert Joint Velocity Commands to Position Commands
 #
 task_context "ToPosConverter" do
+    property("override_output_speed", "double").
+       doc("Speed to write to joint command")
+    property("write_speed", "bool").
+       doc("Write speed value inmput put data or leave it unset")
     input_port("joint_status", "/base/samples/Joints").
         doc("Current Joint Status")
 

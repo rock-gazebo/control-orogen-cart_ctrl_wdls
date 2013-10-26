@@ -13,13 +13,15 @@ class ToPosConverter : public ToPosConverterBase
 protected:
 
     base::commands::Joints command_in_, command_out_, status_;
-    base::Time timestamp_;
+    double override_output_speed_;
+    bool write_speed_;
+    base::Time timestamp_, prev_timestamp_;
 public:
     ToPosConverter(std::string const& name = "cart_ctrl_wdls::ToPosConverter", TaskCore::TaskState initial_state = Stopped);
     ToPosConverter(std::string const& name, RTT::ExecutionEngine* engine, TaskCore::TaskState initial_state = Stopped);
     ~ToPosConverter(){}
-    bool configureHook(){return ToPosConverterBase::configureHook();}
-    bool startHook(){return ToPosConverterBase::startHook();}
+    bool configureHook();
+    bool startHook();
     void updateHook();
     void errorHook(){ToPosConverterBase::errorHook();}
     void stopHook(){ToPosConverterBase::stopHook();}

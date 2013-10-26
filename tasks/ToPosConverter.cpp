@@ -19,6 +19,12 @@ bool ToPosConverter::configureHook()
     bool ok = ToPosConverterBase::configureHook();
     override_output_speed_ = _override_output_speed.get();
     write_speed_ = _write_speed.get();
+    std::string urdf_file = _urdf_file.get();
+
+    //Parse urdf. This cannot fail, since treeFromFile would have failed before.
+    if(urdf_file != "")
+        model_.initFile(urdf_file);
+
     return ok;
 }
 
@@ -49,13 +55,26 @@ void ToPosConverter::updateHook(){
         if(command_out_.empty()){
             command_out_.resize(status_.size());
             command_out_.names = status_.names;
-            for(uint i = 0; i < command_in_.size(); i++)
-                command_out_.elements[i].position = status_.elements[i].position;
         }
+
+        for(uint i = 0; i < command_in_.size(); i++)
+            command_out_.elements[i].position = status_.elements[i].position;
 
         double diff = (timestamp_ - prev_timestamp_).toSeconds();
         for(uint i = 0; i < command_in_.size(); i++){
-            command_out_.elements[i].position += command_in_.elements[i].speed * diff;
+            double new_pos = command_out_.elements[i].position + command_in_.elements[i].speed * diff;
+            //Truncate to joint limits
+            if(boost::shared_ptr<const urdf::Joint> joint = model_.getJoint(command_in_.names[i])){
+                if(new_pos < joint->limits->lower){
+                    LOG_INFO("Truncated joint %s to lower limit: %f", command_in_.names[i].c_str(), joint->limits->lower);
+                    new_pos = joint->limits->lower;
+                }
+                if(new_pos > joint->limits->upper){
+                    LOG_INFO("Truncated joint %s to upper limit: %f", command_in_.names[i].c_str(), joint->limits->upper);
+                    new_pos = joint->limits->upper;
+                }
+            }
+            command_out_.elements[i].position = new_pos;
             if(write_speed_){
                 if(!base::isUnset(override_output_speed_)){
                     LOG_DEBUG("Overriding speed for joint %s with %f", command_out_.names[i].c_str(), override_output_speed_);

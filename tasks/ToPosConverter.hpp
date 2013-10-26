@@ -4,6 +4,7 @@
 #define CART_CTRL_WDLS_TOPOSCONVERTER_TASK_HPP
 
 #include "cart_ctrl_wdls/ToPosConverterBase.hpp"
+#include <urdf/model.h>
 
 namespace cart_ctrl_wdls {
 
@@ -16,6 +17,8 @@ protected:
     double override_output_speed_;
     bool write_speed_;
     base::Time timestamp_, prev_timestamp_;
+    urdf::Model model_;
+
 public:
     ToPosConverter(std::string const& name = "cart_ctrl_wdls::ToPosConverter", TaskCore::TaskState initial_state = Stopped);
     ToPosConverter(std::string const& name, RTT::ExecutionEngine* engine, TaskCore::TaskState initial_state = Stopped);

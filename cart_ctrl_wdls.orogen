@@ -83,6 +83,7 @@ end
 task_context "CartCtrl" do
     needs_configuration
     cycle_time = 0.01
+    runtime_states 'FOLLOWING'
 
     ####### Optional properties: 
 

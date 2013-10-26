@@ -30,7 +30,7 @@ public:
     bool startHook();
     void updateHook();
     void errorHook(){CartCtrlBase::errorHook();}
-    void stopHook(){CartCtrlBase::stopHook();}
+    void stopHook();
     void cleanupHook(){CartCtrlBase::cleanupHook();}
 };
 }

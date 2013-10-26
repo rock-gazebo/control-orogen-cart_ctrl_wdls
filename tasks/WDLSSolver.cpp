@@ -6,8 +6,6 @@
 #include <base/logging.h>
 #include <kdl_conversions/KDLConversions.hpp>
 
-//#define DEBUG
-
 using namespace std;
 using namespace cart_ctrl_wdls;
 
@@ -76,23 +74,28 @@ bool WDLSSolver::configureHook(){
         vel_wdls_solver_->setWeightJS(_weights_js.get().asDiagonal());
 
 
-#ifdef DEBUG
-    cout<<"Initialized Cartesian Controller with following parameters: "<<endl<<endl;
-    cout<<"Root: "<<_root.get()<<endl;
-    cout<<"Tip: "<<_tip.get()<<endl;
-    cout<<"No of joints: "<<no_joints_<<endl;
-    cout<<"Joint names: "; for(uint i = 0; i < solver_output_to_port_.names.size(); i++) cout<<solver_output_to_port_.names[i]<<" "; cout<<endl;
-    cout<<"Task Space weights: "; for(uint i = 0; i < _weights_ts.get().size(); i++) cout<<_weights_ts.get()(i)<<" "; cout<<endl;
-    cout<<"Joint Space weights: "; for(uint i = 0; i < _weights_js.get().size(); i++) cout<<_weights_js.get()(i)<<" "; cout<<endl;
-#endif
+    LOG_DEBUG_S<<"Initialized Cartesian Controller with following parameters: \n"<<endl;
+    LOG_DEBUG_S<<"Root: "<<_root.get()<<endl;
+    LOG_DEBUG_S<<"Tip: "<<_tip.get()<<endl;
+    LOG_DEBUG_S<<"No of joints: "<<no_joints_<<endl;
+    LOG_DEBUG_S<<"Joint names: "; for(uint i = 0; i < solver_output_to_port_.names.size(); i++) cout<<solver_output_to_port_.names[i]<<" "; cout<<endl;
+    LOG_DEBUG_S<<"Task Space weights: "; for(uint i = 0; i < _weights_ts.get().size(); i++) cout<<_weights_ts.get()(i)<<" "; cout<<endl;
+    LOG_DEBUG_S<<"Joint Space weights: "; for(uint i = 0; i < _weights_js.get().size(); i++) cout<<_weights_js.get()(i)<<" "; cout<<endl;
 
     return true;
+}
+
+bool WDLSSolver::startHook()
+{
+    joint_status_from_port_.clear();
+    desired_twist_from_port_.invalidate();
+    return WDLSSolverBase::startHook();
 }
 
 void WDLSSolver::updateHook(){
     WDLSSolverBase::updateHook();
 
-    if(_joint_status.read(joint_status_from_port_) != RTT::NoData){
+    while(_joint_status.read(joint_status_from_port_) == RTT::NewData){
         for(uint i = 0; i < no_joints_; i++){
             double pos = joint_status_from_port_.getElementByName(solver_output_to_port_.names[i]).position;
             std::string name = solver_output_to_port_.names[i];
@@ -109,8 +112,10 @@ void WDLSSolver::updateHook(){
         vel_fk_solver_->JntToCart(joint_status_kdl_, frame_vel_kdl_);
         kdl_conversions::KDL2RigidBodyState(pose_kdl_, frame_vel_kdl_.deriv(), cartesian_status_to_port_);
         _cartesian_status.write(cartesian_status_to_port_);
+    }
 
-        _desired_twist.read(desired_twist_from_port_);
+    while(_desired_twist.read(desired_twist_from_port_) == RTT::NewData){
+
         kdl_conversions::RigidBodyState2KDL(desired_twist_from_port_, desired_twist_);
 
         if(vel_wdls_solver_->CartToJnt(joint_status_kdl_.q, desired_twist_, solver_output_kdl_) < 0){
@@ -123,26 +128,24 @@ void WDLSSolver::updateHook(){
         solver_output_to_port_.time = base::Time::now();
         _solver_output.write(solver_output_to_port_);
 
-
-#ifdef DEBUG
-        cout<<"Status: "<<endl;
-        cout<<"Position: "; for(uint i = 0; i < joint_status_from_port_.size(); i++) cout<<joint_status_from_port_.elements[i].position<<" "; cout<<endl;
-        cout<<"Velocity: "; for(uint i = 0; i < joint_status_from_port_.size(); i++) cout<<joint_status_from_port_.elements[i].speed<<" "; cout<<endl;
-        cout<<"Cur Pose: "<<pose_kdl_<<endl;
-        cout<<"Solver Input: "<<desired_twist_<<endl;
-        cout<<"Solver Output: "<<solver_output_kdl_.data<<endl;
-        cout<<"..................................................."<<endl<<endl;
-#endif
-
+        LOG_DEBUG_S<<"Status: "<<endl;
+        LOG_DEBUG_S<<"Position: "; for(uint i = 0; i < joint_status_from_port_.size(); i++) cout<<joint_status_from_port_.elements[i].position<<" "; cout<<endl;
+        LOG_DEBUG_S<<"Velocity: "; for(uint i = 0; i < joint_status_from_port_.size(); i++) cout<<joint_status_from_port_.elements[i].speed<<" "; cout<<endl;
+        LOG_DEBUG_S<<"Cur Pose: "<<pose_kdl_<<endl;
+        LOG_DEBUG_S<<"Solver Input: "<<desired_twist_<<endl;
+        LOG_DEBUG_S<<"Solver Output: "<<solver_output_kdl_.data<<endl;
+        LOG_DEBUG_S<<"..................................................."<<endl<<endl;
     }
 }
 
 void WDLSSolver::cleanupHook(){
     WDLSSolverBase::cleanupHook();
-    if(pos_fk_solver_)
-        delete pos_fk_solver_;
-    if(vel_fk_solver_)
-        delete vel_fk_solver_;
-    if(vel_wdls_solver_)
-        delete vel_wdls_solver_;
+    delete pos_fk_solver_;
+    delete vel_fk_solver_;
+    delete vel_wdls_solver_;
+}
+
+void WDLSSolver::stopHook()
+{
+    WDLSSolverBase::stopHook();
 }

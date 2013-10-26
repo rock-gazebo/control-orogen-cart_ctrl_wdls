@@ -42,10 +42,10 @@ public:
     WDLSSolver(std::string const& name, RTT::ExecutionEngine* engine);
     ~WDLSSolver(){}
     bool configureHook();
-    bool startHook(){return WDLSSolverBase::startHook();}
+    bool startHook();
     void updateHook();
     void errorHook(){ WDLSSolverBase::errorHook();}
-    void stopHook(){WDLSSolverBase::stopHook();}
+    void stopHook();
     void cleanupHook();
 };
 }

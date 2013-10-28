@@ -4,7 +4,8 @@
 #define CART_CTRL_WDLS_TOPOSCONVERTER_TASK_HPP
 
 #include "cart_ctrl_wdls/ToPosConverterBase.hpp"
-#include <urdf/model.h>
+#include <boost/shared_ptr.hpp>
+#include <urdf_model/model.h>
 
 namespace cart_ctrl_wdls {
 
@@ -17,7 +18,7 @@ protected:
     double override_output_speed_;
     bool write_speed_;
     base::Time timestamp_, prev_timestamp_;
-    urdf::Model model_;
+    boost::shared_ptr<urdf::ModelInterface> model_;
     double position_scale_;
 
 public:

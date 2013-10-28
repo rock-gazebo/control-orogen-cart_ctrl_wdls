@@ -2,6 +2,8 @@
 
 #include "ToPosConverter.hpp"
 #include <base/logging.h>
+#include <urdf_parser/urdf_parser.h>
+#include <fstream>
 
 using namespace cart_ctrl_wdls;
 using namespace std;
@@ -24,7 +26,13 @@ bool ToPosConverter::configureHook()
 
     //Parse urdf. This cannot fail, since treeFromFile would have failed before.
     if(urdf_file != "")
-        model_.initFile(urdf_file);
+    {
+        std::ifstream t( urdf_file.c_str() );
+        std::string xml_str((std::istreambuf_iterator<char>(t)),
+                                 std::istreambuf_iterator<char>());
+        //Parse urdf
+        model_ = urdf::parseURDF( xml_str );
+    }
 
     return ok;
 }
@@ -65,7 +73,7 @@ void ToPosConverter::updateHook(){
         for(uint i = 0; i < command_in_.size(); i++){
             double new_pos = command_out_.elements[i].position + command_in_.elements[i].speed * diff * position_scale_;
             //Truncate to joint limits
-            if(boost::shared_ptr<const urdf::Joint> joint = model_.getJoint(command_in_.names[i])){
+            if(boost::shared_ptr<const urdf::Joint> joint = model_->getJoint(command_in_.names[i])){
                 if(new_pos < joint->limits->lower){
                     LOG_INFO("Truncated joint %s to lower limit: %f", command_in_.names[i].c_str(), joint->limits->lower);
                     new_pos = joint->limits->lower;

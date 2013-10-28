@@ -4,7 +4,7 @@ import_types_from "kdl"
 import_types_from "base"
 using_library "kdl_parser"
 using_library "kdl_conversions"
-using_library "urdf"
+using_library "urdfdom"
 
 #
 # Weighted Damped Least Squares Solver from KDL

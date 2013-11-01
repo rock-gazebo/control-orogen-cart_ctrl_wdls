@@ -85,7 +85,7 @@ void ToPosConverter::updateHook(){
             }
             command_out_.elements[i].position = new_pos;
             if(write_speed_){
-                if(override_output_speed_){
+                if(!base::isUnset(override_output_speed_)){
                     LOG_DEBUG("Overriding speed for joint %s with %f", command_out_.names[i].c_str(), override_output_speed_);
                     command_out_.elements[i].speed = override_output_speed_;
                 }

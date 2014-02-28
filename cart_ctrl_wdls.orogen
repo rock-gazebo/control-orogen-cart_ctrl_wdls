@@ -127,7 +127,9 @@ task_context "ToPosConverter" do
        doc("Write speed value inmput put data or leave it unset")
     property("position_scale", "double", 1.0).
        doc("position = previous_position + speed * cycle_rate * position_scale")
-
+    property("use_position_cmd_as_current", "bool", false).
+       doc("If true, the converter will use the previous position command as current position. 
+            This may result in less noisy output, than using the real position from joint state")
 
     input_port("joint_status", "/base/samples/Joints").
         doc("Current Joint Status")

@@ -29,7 +29,7 @@ bool ToPosConverter::configureHook()
     {
         std::ifstream t( urdf_file_.c_str() );
         std::string xml_str((std::istreambuf_iterator<char>(t)),
-                                 std::istreambuf_iterator<char>());
+                            std::istreambuf_iterator<char>());
         //Parse urdf
         model_ = urdf::parseURDF( xml_str );
     }
@@ -54,8 +54,8 @@ void ToPosConverter::updateHook(){
     while(_command.read(command_in_) == RTT::NewData)
     {
         if(_joint_status.read(status_) == RTT::NoData){
-           LOG_WARN("No sample on joint state port");
-           return;
+            LOG_WARN("No sample on joint state port");
+            return;
         }
         while(_joint_status.read(status_) == RTT::NewData){
             continue;
@@ -75,25 +75,29 @@ void ToPosConverter::updateHook(){
             try{
                 idx = status_.mapNameToIndex(command_in_.names[i]);
             }
-            catch (std::exception e){ 
+            catch (std::exception e){
                 LOG_ERROR("Joint %s is in input command but not in joint status", command_in_.names[i].c_str());
                 throw std::invalid_argument("Invalid joint state");
             }
-            double new_pos = status_[idx].position + command_in_.elements[i].speed * diff * position_scale_;
+            double new_pos;
+            if(!prev_command_out_.empty() || _use_position_cmd_as_current.value()) //Use previous command as current position
+                new_pos = prev_command_out_[i].position + command_in_.elements[i].speed * diff * position_scale_;
+            else //Use real position from joint state
+                new_pos = status_[idx].position + command_in_.elements[i].speed * diff * position_scale_;
 
             if(!urdf_file_.empty())
             {
-               //Truncate to joint limits
-               if(boost::shared_ptr<const urdf::Joint> joint = model_->getJoint(command_in_.names[i])){
-                   if(new_pos < joint->limits->lower){
-                       LOG_INFO("Truncated joint %s to lower limit: %f", command_in_.names[i].c_str(), joint->limits->lower);
-                       new_pos = joint->limits->lower;
-                   }
-                   if(new_pos > joint->limits->upper){
-                       LOG_INFO("Truncated joint %s to upper limit: %f", command_in_.names[i].c_str(), joint->limits->upper);
-                       new_pos = joint->limits->upper;
-                   }
-               }
+                //Truncate to joint limits
+                if(boost::shared_ptr<const urdf::Joint> joint = model_->getJoint(command_in_.names[i])){
+                    if(new_pos < joint->limits->lower){
+                        LOG_INFO("Truncated joint %s to lower limit: %f", command_in_.names[i].c_str(), joint->limits->lower);
+                        new_pos = joint->limits->lower;
+                    }
+                    if(new_pos > joint->limits->upper){
+                        LOG_INFO("Truncated joint %s to upper limit: %f", command_in_.names[i].c_str(), joint->limits->upper);
+                        new_pos = joint->limits->upper;
+                    }
+                }
             }
 
             command_out_.elements[i].position = new_pos;
@@ -112,6 +116,7 @@ void ToPosConverter::updateHook(){
 
         command_out_.time = timestamp_;
         _command_out.write(command_out_);
+        prev_command_out_ = command_out_;
 
         LOG_DEBUG_S << "Difftime: " <<diff<<endl;
         LOG_DEBUG_S <<"In: "; for(uint i = 0; i < command_in_.size(); i++) cout<<command_in_.elements[i].speed<<" "; cout<<endl;

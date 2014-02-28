@@ -14,7 +14,7 @@ class ToPosConverter : public ToPosConverterBase
     friend class ToPosConverterBase;
 protected:
 
-    base::commands::Joints command_in_, command_out_, status_;
+    base::commands::Joints command_in_, command_out_, status_, prev_command_out_;
     double override_output_speed_;
     bool write_speed_;
     base::Time timestamp_, prev_timestamp_;

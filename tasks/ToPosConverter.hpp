@@ -20,7 +20,7 @@ protected:
     base::Time timestamp_, prev_timestamp_;
     boost::shared_ptr<urdf::ModelInterface> model_;
     double position_scale_;
-
+    std::string urdf_file_;
 public:
     ToPosConverter(std::string const& name = "cart_ctrl_wdls::ToPosConverter", TaskCore::TaskState initial_state = Stopped);
     ToPosConverter(std::string const& name, RTT::ExecutionEngine* engine, TaskCore::TaskState initial_state = Stopped);

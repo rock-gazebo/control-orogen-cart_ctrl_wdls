@@ -62,10 +62,9 @@ void ToPosConverter::updateHook(){
         }
 
         if(command_out_.empty()){
-            command_out_.resize(status_.size());
-            command_out_.names = status_.names;
+            command_out_.resize(command_in_.size());
+            command_out_.names = command_in_.names;
         }
-
 
         double diff = (timestamp_ - prev_timestamp_).toSeconds();
 
@@ -80,7 +79,7 @@ void ToPosConverter::updateHook(){
                 throw std::invalid_argument("Invalid joint state");
             }
             double new_pos;
-            if(!prev_command_out_.empty() || _use_position_cmd_as_current.value()) //Use previous command as current position
+            if(_use_position_cmd_as_current.value() && !prev_command_out_.empty()) //Use previous command as current position
                 new_pos = prev_command_out_[i].position + command_in_.elements[i].speed * diff * position_scale_;
             else //Use real position from joint state
                 new_pos = status_[idx].position + command_in_.elements[i].speed * diff * position_scale_;
@@ -117,10 +116,6 @@ void ToPosConverter::updateHook(){
         command_out_.time = timestamp_;
         _command_out.write(command_out_);
         prev_command_out_ = command_out_;
-
-        LOG_DEBUG_S << "Difftime: " <<diff<<endl;
-        LOG_DEBUG_S <<"In: "; for(uint i = 0; i < command_in_.size(); i++) cout<<command_in_.elements[i].speed<<" "; cout<<endl;
-        LOG_DEBUG_S <<"Out: "; for(uint i = 0; i < command_in_.size(); i++) cout<<command_out_.elements[i].position<<" "; cout<<endl;
     }
     prev_timestamp_ = timestamp_;
 }

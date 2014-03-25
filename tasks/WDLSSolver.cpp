@@ -118,6 +118,10 @@ void WDLSSolver::updateHook(){
 
         kdl_conversions::RigidBodyState2KDL(desired_twist_from_port_, desired_twist_);
 
+        //Convert to root frame if the input is supposed to be given in tip coordinates
+        if(_input_in_tip_coordinates.value())
+            desired_twist_ = pose_kdl_.M * desired_twist_;
+
         if(vel_wdls_solver_->CartToJnt(joint_status_kdl_.q, desired_twist_, solver_output_kdl_) < 0){
             LOG_ERROR("IK Computation failed");
             return;

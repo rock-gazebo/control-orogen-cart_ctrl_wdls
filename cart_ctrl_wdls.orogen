@@ -28,6 +28,8 @@ task_context "WDLSSolver" do
         doc("Damping term. Reduces the output velocity in singular configurations. This value, and epsilon, should be chosen with extreme care. Depends on kinematic structure of the robot. Reasonable value for aila's right arm was 0.1")
   
     ####### Optional properties:
+    property("input_in_tip_coordinates", "bool", false).
+        doc("If true, the input twist is assumed to be in tip coordinates, otherwise in root coordinates. Note that the center of rotation will always assumed to be equal to the chosen reference frame. E.g. if the tip is chosen as reference frame, not only the rotational and translational velocity will be expressed in tip coordinates, but also the the center of rotation will be equal to the center of tip frame")
 
     property("epsilon", "double", 1e-5).
         doc("If a singular value is smaller than this, the damping term will be activated. If you want damping in wider range of configurations, increase this value.")

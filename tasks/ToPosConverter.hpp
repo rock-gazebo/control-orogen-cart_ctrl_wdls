@@ -6,6 +6,7 @@
 #include "cart_ctrl_wdls/ToPosConverterBase.hpp"
 #include <boost/shared_ptr.hpp>
 #include <urdf_model/model.h>
+#include <base/commands/Joints.hpp>
 
 namespace cart_ctrl_wdls {
 

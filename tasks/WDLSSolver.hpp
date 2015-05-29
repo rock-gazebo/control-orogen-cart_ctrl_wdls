@@ -7,6 +7,7 @@
 #include <kdl/chainfksolverpos_recursive.hpp>
 #include <kdl/chainiksolvervel_wdls.hpp>
 #include <kdl/chainfksolvervel_recursive.hpp>
+#include <base/commands/Joints.hpp>
 
 namespace cart_ctrl_wdls {
 

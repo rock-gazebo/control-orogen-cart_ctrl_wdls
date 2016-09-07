@@ -2,7 +2,7 @@
 
 #include <kdl/frames_io.hpp>
 #include "CartCtrl.hpp"
-#include <base/logging.h>
+#include <base-logging/Logging.hpp>
 #include <kdl_conversions/KDLConversions.hpp>
 
 //#define DEBUG

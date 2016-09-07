@@ -3,7 +3,7 @@
 #include <kdl/frames_io.hpp>
 #include "WDLSSolver.hpp"
 #include <kdl_parser/kdl_parser.hpp>
-#include <base/logging.h>
+#include <base-logging/Logging.hpp>
 #include <kdl_conversions/KDLConversions.hpp>
 
 using namespace std;

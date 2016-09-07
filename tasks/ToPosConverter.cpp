@@ -1,7 +1,7 @@
 /* Generated from orogen/lib/orogen/templates/tasks/Task.cpp */
 
 #include "ToPosConverter.hpp"
-#include <base/logging.h>
+#include <base-logging/Logging.hpp>
 #include <urdf_parser/urdf_parser.h>
 #include <fstream>
 

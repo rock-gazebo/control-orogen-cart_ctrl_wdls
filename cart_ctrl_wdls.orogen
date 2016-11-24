@@ -2,6 +2,7 @@ name "cart_ctrl_wdls"
 
 import_types_from "kdl"
 import_types_from "base"
+using_library "base-logging"
 using_library "kdl_parser"
 using_library "kdl_conversions"
 using_library "urdfdom"

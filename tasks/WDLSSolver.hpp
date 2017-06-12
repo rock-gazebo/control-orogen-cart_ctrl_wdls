@@ -8,12 +8,14 @@
 #include <kdl/chainiksolvervel_wdls.hpp>
 #include <kdl/chainfksolvervel_recursive.hpp>
 #include <base/commands/Joints.hpp>
+#include "Utilities.hpp"
 
 namespace cart_ctrl_wdls {
 
 class WDLSSolver : public WDLSSolverBase
 {
     friend class WDLSSolverBase;
+
 protected:
     uint no_joints_;
 

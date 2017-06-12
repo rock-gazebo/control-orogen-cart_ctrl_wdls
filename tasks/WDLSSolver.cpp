@@ -5,6 +5,7 @@
 #include <kdl_parser/kdl_parser.hpp>
 #include <base-logging/Logging.hpp>
 #include <kdl_conversions/KDLConversions.hpp>
+#include "Utilities.hpp"
 
 using namespace std;
 using namespace cart_ctrl_wdls;
@@ -24,13 +25,15 @@ WDLSSolver::WDLSSolver(std::string const& name, RTT::ExecutionEngine* engine)
 }
 
 bool WDLSSolver::configureHook(){
-
     if (! WDLSSolverBase::configureHook())
         return false;
 
+    pair<string, kdl_parser::ROBOT_MODEL_FORMAT> robot_model =
+        utilities::getRobotModelString(_urdf_file, _robot_model, _robot_model_format);
+
     KDL::Tree tree;
-    if(!kdl_parser::treeFromFile(_urdf_file.get(), tree)){
-        LOG_ERROR("Unable to parse URDF file %s", _urdf_file.get().c_str());
+    if(!kdl_parser::treeFromString(robot_model.first, tree, robot_model.second)){
+        LOG_ERROR("Unable to parse robot model file %s", robot_model.first.c_str());
         return false;
     }
 

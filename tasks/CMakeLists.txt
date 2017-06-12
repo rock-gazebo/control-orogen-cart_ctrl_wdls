@@ -2,7 +2,7 @@
 
 include(cart_ctrl_wdlsTaskLib)
 ADD_LIBRARY(${CART_CTRL_WDLS_TASKLIB_NAME} SHARED 
-    ${CART_CTRL_WDLS_TASKLIB_SOURCES})
+    ${CART_CTRL_WDLS_TASKLIB_SOURCES} Utilities.cpp)
 add_dependencies(${CART_CTRL_WDLS_TASKLIB_NAME}
     regen-typekit)
 
